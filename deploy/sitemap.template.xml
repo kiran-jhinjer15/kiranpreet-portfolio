@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Template only. This is not the live sitemap.
+  It lives outside web/ so a release build does not publish the placeholder.
+  Replace FINAL_PORTFOLIO_URL with SiteConfig.portfolioUrl, with no trailing slash,
+  then save the result as web/sitemap.xml and uncomment the Sitemap line in web/robots.txt.
+  Do not publish FINAL_PORTFOLIO_URL as a real address.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>FINAL_PORTFOLIO_URL/</loc></url>
+  <url><loc>FINAL_PORTFOLIO_URL/about</loc></url>
+  <url><loc>FINAL_PORTFOLIO_URL/projects</loc></url>
+  <url><loc>FINAL_PORTFOLIO_URL/experience</loc></url>
+  <url><loc>FINAL_PORTFOLIO_URL/contact</loc></url>
+  <url><loc>FINAL_PORTFOLIO_URL/projects/viewghana</loc></url>
+  <url><loc>FINAL_PORTFOLIO_URL/projects/bumper-buds</loc></url>
+  <url><loc>FINAL_PORTFOLIO_URL/projects/daawat</loc></url>
+</urlset>

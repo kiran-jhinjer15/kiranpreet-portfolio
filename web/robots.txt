@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+# Sitemap is omitted until SiteConfig.portfolioUrl is set.
+# Fill deploy/sitemap.template.xml, save it as web/sitemap.xml, then add:
+# Sitemap: https://<final-domain>/sitemap.xml
