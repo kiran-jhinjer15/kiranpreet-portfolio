@@ -8,10 +8,12 @@ import 'package:kiran_portfolio/features/home/presentation/widgets/theme_menu.da
 class MobileNavMenu extends StatelessWidget {
   const MobileNavMenu({
     super.key,
+    required this.onHomeTap,
     required this.onSectionSelected,
     this.activeSection,
   });
 
+  final VoidCallback onHomeTap;
   final ValueChanged<PortfolioSection> onSectionSelected;
   final PortfolioSection? activeSection;
 
@@ -46,6 +48,12 @@ class MobileNavMenu extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    _MobileNavLink(
+                      label: 'Home',
+                      isActive: activeSection == null,
+                      style: textStyle,
+                      onPressed: onHomeTap,
+                    ),
                     for (final section in PortfolioSection.values)
                       _MobileNavLink(
                         key: ValueKey('nav-${section.id}'),
@@ -85,7 +93,7 @@ class _MobileNavLink extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = AppColors.of(context);
-    final color = isActive ? colors.accent : colors.textPrimary;
+    final color = colors.accent;
 
     return Semantics(
       button: true,

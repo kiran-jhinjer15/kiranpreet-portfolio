@@ -8,10 +8,12 @@ class PortfolioPrimaryButton extends StatelessWidget {
     super.key,
     required this.label,
     required this.onPressed,
+    this.borderRadius = AppSpacing.sm,
   });
 
   final String label;
   final VoidCallback onPressed;
+  final double borderRadius;
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +32,10 @@ class PortfolioPrimaryButton extends StatelessWidget {
         }),
         foregroundColor: WidgetStateProperty.all(colors.onAccent),
         overlayColor: WidgetStateProperty.all(colors.pressedOverlay),
+        elevation: WidgetStateProperty.all(1),
+        shadowColor: WidgetStateProperty.all(
+          colors.textPrimary.withValues(alpha: 0.16),
+        ),
         minimumSize: WidgetStateProperty.all(
           const Size(AppSpacing.tapTarget, 48),
         ),
@@ -41,7 +47,7 @@ class PortfolioPrimaryButton extends StatelessWidget {
         ),
         shape: WidgetStateProperty.all(
           RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.sm),
+            borderRadius: BorderRadius.circular(borderRadius),
           ),
         ),
         textStyle: WidgetStateProperty.all(
@@ -59,10 +65,12 @@ class PortfolioSecondaryButton extends StatelessWidget {
     super.key,
     required this.label,
     required this.onPressed,
+    this.borderRadius = AppSpacing.sm,
   });
 
   final String label;
   final VoidCallback? onPressed;
+  final double borderRadius;
 
   @override
   Widget build(BuildContext context) {
@@ -77,24 +85,19 @@ class PortfolioSecondaryButton extends StatelessWidget {
           }
           if (states.contains(WidgetState.hovered) ||
               states.contains(WidgetState.focused)) {
-            return colors.accent;
+            return colors.accentHover;
           }
-          return colors.textPrimary;
+          return colors.accent;
         }),
         backgroundColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.hovered) ||
               states.contains(WidgetState.focused)) {
-            return colors.surface;
+            return colors.background;
           }
-          return colors.background.withValues(alpha: 0);
+          return colors.surface;
         }),
         overlayColor: WidgetStateProperty.all(colors.hoverOverlay),
-        side: WidgetStateProperty.resolveWith((states) {
-          final hovered =
-              states.contains(WidgetState.hovered) ||
-              states.contains(WidgetState.focused);
-          return BorderSide(color: hovered ? colors.accent : colors.border);
-        }),
+        side: WidgetStateProperty.all(BorderSide(color: colors.border)),
         minimumSize: WidgetStateProperty.all(
           const Size(AppSpacing.tapTarget, 48),
         ),
@@ -106,7 +109,7 @@ class PortfolioSecondaryButton extends StatelessWidget {
         ),
         shape: WidgetStateProperty.all(
           RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.sm),
+            borderRadius: BorderRadius.circular(borderRadius),
           ),
         ),
         textStyle: WidgetStateProperty.all(

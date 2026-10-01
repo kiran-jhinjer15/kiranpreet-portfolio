@@ -5,7 +5,9 @@ import 'package:kiran_portfolio/core/constants/app_spacing.dart';
 import 'package:kiran_portfolio/core/responsive/responsive.dart';
 import 'package:kiran_portfolio/core/widgets/app_content.dart';
 import 'package:kiran_portfolio/features/home/presentation/hero_copy.dart';
+import 'package:kiran_portfolio/app/theme/app_colors.dart';
 import 'package:kiran_portfolio/features/home/presentation/widgets/hero_content.dart';
+import 'package:kiran_portfolio/features/home/presentation/widgets/hero_proof.dart';
 import 'package:kiran_portfolio/features/home/presentation/widgets/hero_visual.dart';
 
 class HeroSection extends StatefulWidget {
@@ -62,92 +64,128 @@ class _HeroSectionState extends State<HeroSection>
       desktop: AppSpacing.huge,
     );
 
+    final colors = AppColors.of(context);
+
     return Semantics(
       container: true,
       header: true,
       label: '${HeroCopy.name}, Flutter Developer',
-      child: ConstrainedBox(
-        constraints: BoxConstraints(minHeight: minHeight),
-        child: AppContent(
-          padding: EdgeInsets.symmetric(
-            horizontal: AppSpacing.pageHorizontal(context),
-            vertical: verticalPadding,
-          ),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final twoColumn =
-                  Responsive.isDesktopOrLarger(context) ||
-                  (Responsive.isTablet(context) && constraints.maxWidth >= 780);
+      child: DecoratedBox(
+        decoration: BoxDecoration(color: colors.background),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: minHeight),
+          child: AppContent(
+            padding: EdgeInsets.symmetric(
+              horizontal: AppSpacing.pageHorizontal(context),
+              vertical: verticalPadding,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: colors.surface,
+                    borderRadius: BorderRadius.circular(AppSpacing.xl),
+                    border: Border.all(color: colors.border),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: Responsive.value<double>(
+                        context,
+                        mobile: AppSpacing.lg,
+                        tablet: AppSpacing.xl,
+                        desktop: AppSpacing.xxl,
+                      ),
+                      vertical: Responsive.value<double>(
+                        context,
+                        mobile: AppSpacing.xl,
+                        tablet: AppSpacing.xxl,
+                        desktop: AppSpacing.xxxl,
+                      ),
+                    ),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final twoColumn =
+                            Responsive.isDesktopOrLarger(context) ||
+                            (Responsive.isTablet(context) &&
+                                constraints.maxWidth >= 780);
 
-              if (!twoColumn) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    EntranceTransition(
-                      animation: _controller,
-                      begin: const Offset(0, 0.06),
-                      interval: const Interval(
-                        0,
-                        0.72,
-                        curve: Curves.easeOutCubic,
-                      ),
-                      child: const HeroContent(),
-                    ),
-                    const SizedBox(height: AppSpacing.xxxl),
-                    EntranceTransition(
-                      animation: _controller,
-                      begin: const Offset(0, 0.04),
-                      interval: const Interval(
-                        0.22,
-                        1,
-                        curve: Curves.easeOutCubic,
-                      ),
-                      child: const Center(child: HeroVisual()),
-                    ),
-                  ],
-                );
-              }
+                        if (!twoColumn) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              EntranceTransition(
+                                animation: _controller,
+                                begin: const Offset(0, 0.06),
+                                interval: const Interval(
+                                  0,
+                                  0.72,
+                                  curve: Curves.easeOutCubic,
+                                ),
+                                child: const HeroContent(),
+                              ),
+                              const SizedBox(height: AppSpacing.xxxl),
+                              EntranceTransition(
+                                animation: _controller,
+                                begin: const Offset(0, 0.04),
+                                interval: const Interval(
+                                  0.22,
+                                  1,
+                                  curve: Curves.easeOutCubic,
+                                ),
+                                child: const Center(child: HeroVisual()),
+                              ),
+                            ],
+                          );
+                        }
 
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    flex: 6,
-                    child: EntranceTransition(
-                      animation: _controller,
-                      begin: const Offset(0, 0.06),
-                      interval: const Interval(
-                        0,
-                        0.72,
-                        curve: Curves.easeOutCubic,
-                      ),
-                      child: const HeroContent(),
+                        return Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              flex: 6,
+                              child: EntranceTransition(
+                                animation: _controller,
+                                begin: const Offset(0, 0.06),
+                                interval: const Interval(
+                                  0,
+                                  0.72,
+                                  curve: Curves.easeOutCubic,
+                                ),
+                                child: const HeroContent(),
+                              ),
+                            ),
+                            SizedBox(
+                              width: Responsive.value<double>(
+                                context,
+                                mobile: AppSpacing.xl,
+                                tablet: AppSpacing.xxl,
+                                desktop: AppSpacing.xxxl,
+                              ),
+                            ),
+                            Expanded(
+                              flex: 5,
+                              child: EntranceTransition(
+                                animation: _controller,
+                                begin: const Offset(0.05, 0),
+                                interval: const Interval(
+                                  0.18,
+                                  1,
+                                  curve: Curves.easeOutCubic,
+                                ),
+                                child: const HeroVisual(),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ),
-                  SizedBox(
-                    width: Responsive.value<double>(
-                      context,
-                      mobile: AppSpacing.xl,
-                      tablet: AppSpacing.xxl,
-                      desktop: AppSpacing.xxxl,
-                    ),
-                  ),
-                  Expanded(
-                    flex: 5,
-                    child: EntranceTransition(
-                      animation: _controller,
-                      begin: const Offset(0.05, 0),
-                      interval: const Interval(
-                        0.18,
-                        1,
-                        curve: Curves.easeOutCubic,
-                      ),
-                      child: const HeroVisual(),
-                    ),
-                  ),
-                ],
-              );
-            },
+                ),
+                const SizedBox(height: AppSpacing.xxl),
+                const HeroProof(),
+              ],
+            ),
           ),
         ),
       ),

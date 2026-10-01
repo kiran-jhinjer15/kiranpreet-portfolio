@@ -9,27 +9,46 @@ class HeroProof extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
     final items = HeroProofData.items;
     final compact = Responsive.isMobile(context);
 
-    if (compact) {
-      return Wrap(
-        spacing: AppSpacing.xxl,
-        runSpacing: AppSpacing.lg,
-        children: [for (final item in items) _ProofItem(item: item)],
-      );
-    }
-
-    return Wrap(
-      spacing: AppSpacing.xl,
-      runSpacing: AppSpacing.lg,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      children: [
-        for (var i = 0; i < items.length; i++) ...[
-          if (i != 0) const _ProofDivider(),
-          _ProofItem(item: items[i]),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.xl),
+        border: Border.all(color: colors.border),
+        boxShadow: [
+          BoxShadow(
+            color: colors.textPrimary.withValues(alpha: 0.04),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
         ],
-      ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.lg,
+        ),
+        child: compact
+            ? Column(
+                children: [
+                  for (var i = 0; i < items.length; i++) ...[
+                    if (i != 0) const SizedBox(height: AppSpacing.md),
+                    _ProofItem(item: items[i]),
+                  ],
+                ],
+              )
+            : Row(
+                children: [
+                  for (var i = 0; i < items.length; i++) ...[
+                    if (i != 0) const _ProofDivider(),
+                    Expanded(child: _ProofItem(item: items[i])),
+                  ],
+                ],
+              ),
+      ),
     );
   }
 }
@@ -48,21 +67,36 @@ class _ProofItem extends StatelessWidget {
     return Semantics(
       label: '${item.title} ${item.subtitle}',
       child: Row(
-        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 2,
-            height: AppSpacing.xxl,
+            width: 40,
+            height: 40,
             margin: const EdgeInsets.only(right: AppSpacing.md),
-            color: colors.accent,
+            decoration: BoxDecoration(
+              color: colors.background,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(item.icon, size: 18, color: colors.accent),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(item.title, style: titleStyle),
-              const SizedBox(height: AppSpacing.xs),
-              Text(item.subtitle, style: subtitleStyle),
-            ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: titleStyle,
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  item.subtitle,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: subtitleStyle,
+                ),
+              ],
+            ),
           ),
         ],
       ),

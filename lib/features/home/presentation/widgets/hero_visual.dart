@@ -1,8 +1,8 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:kiran_portfolio/app/theme/app_colors.dart';
-import 'package:kiran_portfolio/core/constants/app_constants.dart';
 import 'package:kiran_portfolio/core/constants/app_spacing.dart';
-import 'package:kiran_portfolio/core/responsive/responsive.dart';
 
 class HeroVisual extends StatefulWidget {
   const HeroVisual({super.key});
@@ -11,242 +11,323 @@ class HeroVisual extends StatefulWidget {
   State<HeroVisual> createState() => _HeroVisualState();
 }
 
-class _HeroVisualState extends State<HeroVisual> {
-  bool _hovered = false;
+class _HeroVisualState extends State<HeroVisual>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _float;
+
+  @override
+  void initState() {
+    super.initState();
+    _float = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2800),
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      final inWidgetTest = WidgetsBinding.instance.runtimeType
+          .toString()
+          .contains('TestWidgetsFlutterBinding');
+      if (MediaQuery.disableAnimationsOf(context) || inWidgetTest) {
+        _float.value = 0;
+      } else {
+        _float.repeat(reverse: true);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _float.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final compact = !Responsive.isDesktopOrLarger(context);
+    final colors = AppColors.of(context);
 
     return Semantics(
-      label: 'Abstract Flutter application composition',
-      child: MouseRegion(
-        onEnter: (_) => setState(() => _hovered = true),
-        onExit: (_) => setState(() => _hovered = false),
-        child: AnimatedScale(
-          scale: _hovered && !compact ? 1.015 : 1,
-          duration: AppConstants.motionFast,
-          curve: Curves.easeOut,
-          child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: compact ? 420 : 460),
-            child: SizedBox(
-              height: compact ? 340 : 400,
-              child: const _VisualComposition(),
+      label: 'Flutter mobile application visual for Android and iOS',
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final maxWidth = constraints.maxWidth.isFinite
+              ? constraints.maxWidth
+              : 460.0;
+          final side = maxWidth.clamp(260.0, 480.0);
+          final diameter = side * 0.72;
+
+          return SizedBox(
+            width: side,
+            height: side,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                CustomPaint(
+                  size: Size(side, side),
+                  painter: _PortraitArcPainter(
+                    color: colors.accent,
+                    radius: diameter / 2 + side * 0.07,
+                  ),
+                ),
+                Container(
+                  width: diameter,
+                  height: diameter,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: colors.surface,
+                    boxShadow: [
+                      BoxShadow(
+                        color: colors.textPrimary.withValues(alpha: 0.08),
+                        blurRadius: 28,
+                        offset: const Offset(0, 16),
+                      ),
+                    ],
+                  ),
+                  child: ClipOval(
+                    child: _PortraitScene(float: _float, diameter: diameter),
+                  ),
+                ),
+                Positioned(
+                  left: 0,
+                  top: side * 0.06,
+                  child: const _FlutterBadge(),
+                ),
+                Positioned(
+                  right: 0,
+                  bottom: side * 0.07,
+                  child: const _PlatformBadge(),
+                ),
+              ],
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
 }
 
-class _VisualComposition extends StatelessWidget {
-  const _VisualComposition();
+class _PortraitArcPainter extends CustomPainter {
+  const _PortraitArcPainter({required this.color, required this.radius});
+
+  final Color color;
+  final double radius;
 
   @override
-  Widget build(BuildContext context) {
-    return const Stack(
-      clipBehavior: Clip.none,
-      children: [
-        Positioned.fill(top: 36, right: 20, child: _AppPreviewCard()),
-        Positioned(top: 0, right: 0, child: _CodeCard()),
-        Positioned(left: 0, bottom: 8, child: _StackChip()),
-      ],
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.5
+      ..strokeCap = StrokeCap.round
+      ..color = color;
+    const start = -2.55;
+    const sweep = 4.7;
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      start,
+      sweep,
+      false,
+      paint,
     );
+
+    final dotPaint = Paint()..color = color;
+    for (final angle in [
+      start,
+      start + sweep * 0.38,
+      start + sweep * 0.72,
+      start + sweep,
+    ]) {
+      canvas.drawCircle(_point(center, radius, angle), 4.5, dotPaint);
+    }
+  }
+
+  Offset _point(Offset center, double radius, double angle) {
+    return center + Offset(math.cos(angle), math.sin(angle)) * radius;
+  }
+
+  @override
+  bool shouldRepaint(covariant _PortraitArcPainter oldDelegate) {
+    return oldDelegate.color != color || oldDelegate.radius != radius;
   }
 }
 
-class _AppPreviewCard extends StatelessWidget {
-  const _AppPreviewCard();
+class _PortraitScene extends StatelessWidget {
+  const _PortraitScene({required this.float, required this.diameter});
+
+  final Animation<double> float;
+  final double diameter;
 
   @override
   Widget build(BuildContext context) {
     final colors = AppColors.of(context);
-    final titleStyle = Theme.of(context).textTheme.titleMedium;
-    final captionStyle = Theme.of(context).textTheme.bodySmall;
+    final scene = diameter * 1.15;
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: colors.surfaceElevated,
-        borderRadius: BorderRadius.circular(AppSpacing.md),
-        border: Border.all(color: colors.border),
-        boxShadow: [
-          BoxShadow(
-            color: colors.textPrimary.withValues(alpha: 0.08),
-            blurRadius: 28,
-            offset: const Offset(0, 14),
+    return ColoredBox(
+      color: colors.background,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Positioned(
+            right: -scene * 0.08,
+            top: scene * 0.02,
+            child: _Blob(
+              size: scene * 0.46,
+              gradient: LinearGradient(
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
+                colors: [
+                  colors.accent.withValues(alpha: 0.22),
+                  colors.blush.withValues(alpha: 0.38),
+                ],
+              ),
+            ),
+          ),
+          Positioned(
+            left: -scene * 0.12,
+            bottom: -scene * 0.02,
+            child: _Blob(
+              size: scene * 0.42,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  colors.blush.withValues(alpha: 0.55),
+                  colors.accent.withValues(alpha: 0.24),
+                ],
+              ),
+            ),
+          ),
+          Positioned(
+            right: scene * 0.08,
+            bottom: scene * 0.04,
+            child: _Blob(size: scene * 0.18, color: colors.rose),
+          ),
+          AnimatedBuilder(
+            animation: float,
+            builder: (context, child) {
+              final dy = (float.value - 0.5) * 8;
+              return Transform.translate(offset: Offset(0, dy), child: child);
+            },
+            child: Transform.scale(
+              scale: diameter * 0.96 / 290,
+              child: const _PhonePair(),
+            ),
           ),
         ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                _Dot(color: colors.border),
-                const SizedBox(width: AppSpacing.sm),
-                _Dot(color: colors.border),
-                const SizedBox(width: AppSpacing.sm),
-                _Dot(color: colors.accent),
-                const Spacer(),
-                Text('Production UI', style: captionStyle),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            Text('Mobile workspace', style: titleStyle),
-            const SizedBox(height: AppSpacing.xs),
-            Text('Android · iOS · Flutter', style: captionStyle),
-            const SizedBox(height: AppSpacing.lg),
-            const _PreviewRow(),
-            const SizedBox(height: AppSpacing.md),
-            const _PreviewRow(emphasized: true),
-            const SizedBox(height: AppSpacing.md),
-            const _PreviewRow(),
-            const Spacer(),
-            Row(
-              children: [
-                const Expanded(child: _NavGlyph(active: false)),
-                const SizedBox(width: AppSpacing.sm),
-                const Expanded(child: _NavGlyph(active: true)),
-                const SizedBox(width: AppSpacing.sm),
-                const Expanded(child: _NavGlyph(active: false)),
-              ],
-            ),
-          ],
-        ),
+    );
+  }
+}
+
+class _Blob extends StatelessWidget {
+  const _Blob({required this.size, this.color, this.gradient});
+
+  final double size;
+  final Color? color;
+  final Gradient? gradient;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: gradient == null ? color?.withValues(alpha: 0.75) : null,
+        gradient: gradient,
+        shape: BoxShape.circle,
       ),
     );
   }
 }
 
-class _PreviewRow extends StatelessWidget {
-  const _PreviewRow({this.emphasized = false});
-
-  final bool emphasized;
+class _PhonePair extends StatelessWidget {
+  const _PhonePair();
 
   @override
   Widget build(BuildContext context) {
-    final colors = AppColors.of(context);
-
-    return Row(
-      children: [
-        Container(
-          width: AppSpacing.xl,
-          height: AppSpacing.xl,
-          decoration: BoxDecoration(
-            color: emphasized
-                ? colors.accent.withValues(alpha: 0.18)
-                : colors.border,
-            borderRadius: BorderRadius.circular(AppSpacing.xs),
-          ),
-        ),
-        const SizedBox(width: AppSpacing.md),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _Bar(
-                widthFactor: emphasized ? 0.72 : 0.58,
-                color: emphasized ? colors.textPrimary : colors.textSecondary,
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              _Bar(widthFactor: emphasized ? 0.46 : 0.38, color: colors.border),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _Bar extends StatelessWidget {
-  const _Bar({required this.widthFactor, required this.color});
-
-  final double widthFactor;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return FractionallySizedBox(
-      widthFactor: widthFactor,
-      child: Container(
-        height: 6,
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.45),
-          borderRadius: BorderRadius.circular(99),
-        ),
+    return const SizedBox(
+      width: 250,
+      height: 290,
+      child: Stack(
+        children: [
+          Positioned(right: 0, top: 26, child: _PhoneFrame(title: 'iOS')),
+          Positioned(left: 0, top: 0, child: _PhoneFrame(title: 'Android')),
+        ],
       ),
     );
   }
 }
 
-class _CodeCard extends StatelessWidget {
-  const _CodeCard();
+class _PhoneFrame extends StatelessWidget {
+  const _PhoneFrame({required this.title});
 
-  static const double _width = 248;
+  final String title;
 
   @override
   Widget build(BuildContext context) {
     final colors = AppColors.of(context);
-    final codeStyle = Theme.of(context).textTheme.bodySmall?.copyWith(
-      fontFamily: 'monospace',
-      height: 1.55,
-      color: colors.textSecondary,
-    );
 
-    return SizedBox(
-      width: _width,
+    return Container(
+      width: 132,
+      height: 248,
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(26),
+        border: Border.all(color: colors.border),
+        boxShadow: [
+          BoxShadow(
+            color: colors.textPrimary.withValues(alpha: 0.06),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: colors.surface,
-          borderRadius: BorderRadius.circular(AppSpacing.md),
-          border: Border.all(color: colors.border),
-          boxShadow: [
-            BoxShadow(
-              color: colors.textPrimary.withValues(alpha: 0.06),
-              blurRadius: 18,
-              offset: const Offset(0, 8),
-            ),
-          ],
+          color: colors.background,
+          borderRadius: BorderRadius.circular(18),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
+          padding: const EdgeInsets.all(AppSpacing.md),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
-                children: [
-                  Container(
-                    width: AppSpacing.sm,
-                    height: AppSpacing.sm,
-                    decoration: BoxDecoration(
-                      color: colors.accent,
-                      borderRadius: BorderRadius.circular(99),
-                    ),
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: colors.border,
+                    borderRadius: BorderRadius.circular(4),
                   ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Text(
-                    'main.dart',
-                    style: Theme.of(context).textTheme.labelMedium,
-                  ),
-                ],
+                ),
               ),
               const SizedBox(height: AppSpacing.md),
-              Text.rich(
-                TextSpan(
-                  style: codeStyle,
-                  children: [
-                    TextSpan(
-                      text: 'class ',
-                      style: codeStyle?.copyWith(color: colors.accent),
-                    ),
-                    const TextSpan(text: 'Portfolio {\n'),
-                    const TextSpan(text: '  build() => App();\n'),
-                    const TextSpan(text: '}'),
-                  ],
+              Text(title, style: Theme.of(context).textTheme.labelLarge),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                'Flutter',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(color: colors.accent),
+              ),
+              const Spacer(),
+              Container(
+                height: 28,
+                decoration: BoxDecoration(
+                  color: colors.accent.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Container(
+                height: 14,
+                width: 64,
+                decoration: BoxDecoration(
+                  color: colors.border,
+                  borderRadius: BorderRadius.circular(8),
                 ),
               ),
             ],
@@ -257,67 +338,73 @@ class _CodeCard extends StatelessWidget {
   }
 }
 
-class _StackChip extends StatelessWidget {
-  const _StackChip();
+class _FlutterBadge extends StatelessWidget {
+  const _FlutterBadge();
 
   @override
   Widget build(BuildContext context) {
     final colors = AppColors.of(context);
 
-    return DecoratedBox(
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
       decoration: BoxDecoration(
-        color: colors.surfaceElevated,
-        borderRadius: BorderRadius.circular(AppSpacing.sm),
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(999),
         border: Border.all(color: colors.border),
+        boxShadow: [
+          BoxShadow(
+            color: colors.textPrimary.withValues(alpha: 0.06),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.sm,
-        ),
-        child: Text(
-          'Flutter / Dart',
-          style: Theme.of(
-            context,
-          ).textTheme.labelMedium?.copyWith(color: colors.textPrimary),
-        ),
+      child: Text(
+        'Flutter / Dart',
+        style: Theme.of(
+          context,
+        ).textTheme.labelLarge?.copyWith(color: colors.accent),
       ),
     );
   }
 }
 
-class _NavGlyph extends StatelessWidget {
-  const _NavGlyph({required this.active});
-
-  final bool active;
+class _PlatformBadge extends StatelessWidget {
+  const _PlatformBadge();
 
   @override
   Widget build(BuildContext context) {
     final colors = AppColors.of(context);
 
     return Container(
-      height: AppSpacing.lg,
-      decoration: BoxDecoration(
-        color: active ? colors.accent.withValues(alpha: 0.35) : colors.border,
-        borderRadius: BorderRadius.circular(99),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
       ),
-    );
-  }
-}
-
-class _Dot extends StatelessWidget {
-  const _Dot({required this.color});
-
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: AppSpacing.sm,
-      height: AppSpacing.sm,
       decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(99),
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: colors.border),
+        boxShadow: [
+          BoxShadow(
+            color: colors.textPrimary.withValues(alpha: 0.06),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.android, size: 16, color: colors.accent),
+          const SizedBox(width: AppSpacing.xs),
+          Icon(Icons.phone_iphone, size: 16, color: colors.accent),
+          const SizedBox(width: AppSpacing.sm),
+          Text('Android + iOS', style: Theme.of(context).textTheme.labelLarge),
+        ],
       ),
     );
   }

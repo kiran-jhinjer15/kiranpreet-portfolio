@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kiran_portfolio/features/contact/presentation/widgets/contact_section.dart';
+import 'package:kiran_portfolio/features/home/presentation/widgets/editorial_layout.dart';
 import 'package:kiran_portfolio/features/home/presentation/widgets/portfolio_shell.dart';
 
 class ContactPage extends StatelessWidget {
@@ -7,6 +8,8 @@ class ContactPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const PortfolioShell(body: ContactSection());
+    return const PortfolioShell(
+      body: EditorialLayout(child: ContactSection()),
+    );
   }
 }

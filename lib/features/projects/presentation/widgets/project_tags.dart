@@ -12,19 +12,15 @@ class ProjectTags extends StatelessWidget {
     return Wrap(
       spacing: AppSpacing.sm,
       runSpacing: AppSpacing.sm,
-      children: [
-        for (var i = 0; i < technologies.length; i++)
-          _ProjectTag(label: technologies[i], emphasized: i == 0),
-      ],
+      children: [for (final label in technologies) _ProjectTag(label: label)],
     );
   }
 }
 
 class _ProjectTag extends StatelessWidget {
-  const _ProjectTag({required this.label, required this.emphasized});
+  const _ProjectTag({required this.label});
 
   final String label;
-  final bool emphasized;
 
   @override
   Widget build(BuildContext context) {
@@ -32,13 +28,9 @@ class _ProjectTag extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: colors.background,
-        borderRadius: BorderRadius.circular(AppSpacing.xs),
-        border: Border.all(
-          color: emphasized
-              ? colors.accent.withValues(alpha: 0.35)
-              : colors.border,
-        ),
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: colors.border),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(
@@ -47,9 +39,9 @@ class _ProjectTag extends StatelessWidget {
         ),
         child: Text(
           label,
-          style: Theme.of(context).textTheme.labelMedium?.copyWith(
-            color: emphasized ? colors.accent : colors.textPrimary,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.labelMedium?.copyWith(color: colors.accent),
         ),
       ),
     );

@@ -57,7 +57,7 @@ class ProjectData {
 
   String? get primaryImage => heroImage ?? thumbnail;
 
-   String? get previewAsset {
+  String? get previewAsset {
     if (screenshots.isNotEmpty) {
       return screenshots.first;
     }
@@ -68,7 +68,7 @@ class ProjectData {
 
   String get assetDirectory => ProjectAssets.directoryFor(id);
 
-   String screenshotLabel(int index) {
+  String screenshotLabel(int index) {
     if (screenshots.length <= 1) {
       return '$title, $category screen';
     }
@@ -89,13 +89,14 @@ class ProjectData {
 
 abstract final class ProjectsData {
   static const String eyebrow = 'SELECTED WORK';
-  static const String heading = "Projects I've built and worked on.";
+  static const String heading = 'Featured Projects';
+  static const String viewAll = 'View All Projects →';
   static const String description =
       "A selection of mobile applications and digital products I've contributed to across different domains, from utility apps and social platforms to restaurant, travel and service-based applications.";
   static const String otherHeading = 'Other Projects';
   static const String contributionHeading = 'My contribution';
 
-   static const List<ProjectData> caseStudies = [viewghana, bumperBuds, daawat];
+  static const List<ProjectData> caseStudies = [viewghana, bumperBuds, daawat];
 
   static ProjectData? nextCaseStudy(ProjectData project) {
     final index = caseStudies.indexWhere((item) => item.id == project.id);

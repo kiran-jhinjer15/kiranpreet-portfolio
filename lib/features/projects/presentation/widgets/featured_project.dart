@@ -202,3 +202,98 @@ class _FeaturedBody extends StatelessWidget {
     );
   }
 }
+
+class FeaturedProjectCard extends StatefulWidget {
+  const FeaturedProjectCard({super.key, required this.project});
+
+  final ProjectData project;
+
+  @override
+  State<FeaturedProjectCard> createState() => _FeaturedProjectCardState();
+}
+
+class _FeaturedProjectCardState extends State<FeaturedProjectCard> {
+  bool _hovered = false;
+
+  bool get _hoverEnabled => !Responsive.isMobile(context);
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+    final project = widget.project;
+
+    return MouseRegion(
+      onEnter: (_) {
+        if (_hoverEnabled) {
+          setState(() => _hovered = true);
+        }
+      },
+      onExit: (_) {
+        if (_hovered) {
+          setState(() => _hovered = false);
+        }
+      },
+      child: AnimatedSlide(
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOut,
+        offset: _hovered ? const Offset(0, -0.01) : Offset.zero,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOut,
+          decoration: BoxDecoration(
+            color: colors.projectSurface(project.id.hashCode),
+            borderRadius: BorderRadius.circular(AppSpacing.xl),
+            border: Border.all(
+              color: _hovered
+                  ? colors.accent.withValues(alpha: 0.45)
+                  : colors.border,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: colors.textPrimary.withValues(
+                  alpha: _hovered ? 0.08 : 0.04,
+                ),
+                blurRadius: _hovered ? 22 : 14,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ProjectVisual(project: project, height: 168),
+              Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(project.title, style: textTheme.titleLarge),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      project.description,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colors.textSecondary,
+                      ),
+                    ),
+                    if (project.technologies.isNotEmpty) ...[
+                      const SizedBox(height: AppSpacing.md),
+                      ProjectTags(
+                        technologies: project.technologies.take(4).toList(),
+                      ),
+                    ],
+                    const SizedBox(height: AppSpacing.md),
+                    ProjectLinks(project: project),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

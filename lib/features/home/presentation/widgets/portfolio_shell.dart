@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:kiran_portfolio/app/routes/app_routes.dart';
 import 'package:kiran_portfolio/app/theme/app_colors.dart';
 import 'package:kiran_portfolio/core/constants/app_constants.dart';
 import 'package:kiran_portfolio/core/constants/app_spacing.dart';
@@ -113,6 +114,15 @@ class _PortfolioShellState extends State<PortfolioShell> {
     setState(() => _isMenuOpen = !_isMenuOpen);
   }
 
+  void _onBrandTap() {
+    _closeMenu();
+    if (AppRouter.delegate.currentConfiguration == AppRoutes.profile) {
+      _scrollToTop();
+      return;
+    }
+    AppRouter.go(AppRoutes.profile);
+  }
+
   void _scrollToTop() {
     _closeMenu();
     if (!_scrollController.hasClients) {
@@ -132,7 +142,12 @@ class _PortfolioShellState extends State<PortfolioShell> {
     _closeMenu();
     final targetContext = _sectionKeys[section]?.currentContext;
     if (targetContext == null) {
-      widget.onUnavailableSection?.call(section);
+      if (widget.onUnavailableSection != null) {
+        widget.onUnavailableSection!.call(section);
+      } else if (AppRouter.delegate.currentConfiguration != AppRoutes.home) {
+        SectionRequest.request(section);
+        AppRouter.go(AppRoutes.home);
+      }
       return;
     }
     if (_activeSection != section) {
@@ -144,7 +159,7 @@ class _PortfolioShellState extends State<PortfolioShell> {
   @override
   Widget build(BuildContext context) {
     final colors = AppColors.of(context);
-    final isCompact = !Responsive.isDesktopOrLarger(context);
+    final isCompact = Responsive.isMobile(context);
     final showMenu = isCompact && _isMenuOpen;
 
     if (!isCompact && _isMenuOpen) {
@@ -180,9 +195,7 @@ class _PortfolioShellState extends State<PortfolioShell> {
                 PortfolioNavbar(
                   isScrolled: _isScrolled,
                   isMenuOpen: _isMenuOpen,
-                  activeSection: _activeSection,
-                  onBrandTap: _scrollToTop,
-                  onSectionSelected: _scrollToSection,
+                  onBrandTap: _onBrandTap,
                   onMenuToggle: _toggleMenu,
                 ),
                 Expanded(
@@ -215,6 +228,7 @@ class _PortfolioShellState extends State<PortfolioShell> {
                           right: 0,
                           child: MobileNavMenu(
                             activeSection: _activeSection,
+                            onHomeTap: _scrollToTop,
                             onSectionSelected: _scrollToSection,
                           ),
                         ),

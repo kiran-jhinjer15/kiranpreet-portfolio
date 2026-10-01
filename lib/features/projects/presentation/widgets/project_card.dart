@@ -52,7 +52,7 @@ class _ProjectCardState extends State<ProjectCard> {
           width: double.infinity,
           padding: const EdgeInsets.all(AppSpacing.lg),
           decoration: BoxDecoration(
-            color: colors.surfaceElevated,
+            color: colors.projectSurface(project.id.hashCode),
             borderRadius: BorderRadius.circular(AppSpacing.sm),
             border: Border.all(
               color: _hovered

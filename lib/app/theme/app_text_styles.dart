@@ -7,17 +7,17 @@ abstract final class AppTextStyles {
   static const TextStyle displayLarge = TextStyle(
     fontFamily: fontFamily,
     fontSize: 48,
-    fontWeight: FontWeight.w700,
+    fontWeight: FontWeight.w600,
     height: 1.08,
-    letterSpacing: -1.2,
+    letterSpacing: -0.6,
   );
 
   static const TextStyle displayMedium = TextStyle(
     fontFamily: fontFamily,
     fontSize: 40,
-    fontWeight: FontWeight.w700,
+    fontWeight: FontWeight.w600,
     height: 1.12,
-    letterSpacing: -0.8,
+    letterSpacing: -0.4,
   );
 
   static const TextStyle headlineLarge = TextStyle(
@@ -100,7 +100,7 @@ abstract final class AppTextStyles {
       headlineMedium: headlineMedium.copyWith(color: palette.textPrimary),
       titleLarge: titleLarge.copyWith(color: palette.textPrimary),
       titleMedium: titleMedium.copyWith(color: palette.textPrimary),
-      bodyLarge: bodyLarge.copyWith(color: palette.textPrimary),
+      bodyLarge: bodyLarge.copyWith(color: palette.textSecondary),
       bodyMedium: bodyMedium.copyWith(color: palette.textSecondary),
       bodySmall: bodySmall.copyWith(color: palette.textSecondary),
       labelLarge: labelLarge.copyWith(color: palette.textPrimary),

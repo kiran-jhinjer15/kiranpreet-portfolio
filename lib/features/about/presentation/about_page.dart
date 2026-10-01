@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kiran_portfolio/features/home/presentation/widgets/editorial_layout.dart';
 import 'package:kiran_portfolio/features/home/presentation/widgets/portfolio_shell.dart';
 
 class AboutPage extends StatelessWidget {
@@ -6,6 +7,8 @@ class AboutPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const PortfolioShell();
+    return const PortfolioShell(
+      body: EditorialLayout(child: SizedBox.shrink()),
+    );
   }
 }

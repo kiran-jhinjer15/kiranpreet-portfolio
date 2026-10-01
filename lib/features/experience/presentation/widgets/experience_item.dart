@@ -43,7 +43,7 @@ class _ExperienceItemCardState extends State<ExperienceItemCard> {
       width: double.infinity,
       padding: EdgeInsets.all(compact ? AppSpacing.lg : AppSpacing.xl),
       decoration: BoxDecoration(
-        color: colors.surfaceElevated,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.sm),
         border: Border.all(
           color: item.isCurrent
@@ -65,7 +65,10 @@ class _ExperienceItemCardState extends State<ExperienceItemCard> {
             ],
           ),
           const SizedBox(height: AppSpacing.xs),
-          Text(item.displayRole, style: textTheme.bodyLarge),
+          Text(
+            item.displayRole,
+            style: textTheme.bodyLarge?.copyWith(color: colors.accent),
+          ),
           if (item.level != null) ...[
             const SizedBox(height: AppSpacing.xs),
             Text(
@@ -114,7 +117,7 @@ class _ExperienceItemCardState extends State<ExperienceItemCard> {
                     child: Text(
                       point,
                       style: textTheme.bodyMedium?.copyWith(
-                        color: colors.textPrimary,
+                        color: colors.textSecondary,
                       ),
                     ),
                   ),

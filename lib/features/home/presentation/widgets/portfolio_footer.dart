@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:kiran_portfolio/app/theme/app_colors.dart';
 import 'package:kiran_portfolio/core/constants/app_constants.dart';
 import 'package:kiran_portfolio/core/constants/app_spacing.dart';
-import 'package:kiran_portfolio/core/navigation/portfolio_section.dart';
 import 'package:kiran_portfolio/core/navigation/section_navigator.dart';
+import 'package:kiran_portfolio/features/contact/data/contact_data.dart';
 import 'package:kiran_portfolio/core/responsive/responsive.dart';
 import 'package:kiran_portfolio/core/widgets/app_content.dart';
 import 'package:kiran_portfolio/features/contact/presentation/widgets/contact_social_button.dart';
@@ -26,13 +26,13 @@ class PortfolioFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = AppColors.of(context);
-    final wide = Responsive.isDesktopOrLarger(context);
 
     return Semantics(
       container: true,
       label: 'Footer',
       child: DecoratedBox(
         decoration: BoxDecoration(
+          color: colors.footer,
           border: Border(top: BorderSide(color: colors.border)),
         ),
         child: AppContent(
@@ -45,20 +45,8 @@ class PortfolioFooter extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              if (wide)
-                const Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(flex: 5, child: _FooterBrand()),
-                    SizedBox(width: AppSpacing.xxl),
-                    Expanded(flex: 4, child: _FooterLinks(alignEnd: true)),
-                  ],
-                )
-              else ...[
-                const _FooterBrand(),
-                const SizedBox(height: AppSpacing.xl),
-                const _FooterLinks(alignEnd: false),
-              ],
+              const _FooterBrand(),
+              const _FooterContacts(),
               const SizedBox(height: AppSpacing.xl),
               const _FooterMeta(),
             ],
@@ -99,77 +87,35 @@ class _FooterBrand extends StatelessWidget {
   }
 }
 
-class _FooterLinks extends StatelessWidget {
-  const _FooterLinks({required this.alignEnd});
-
-  final bool alignEnd;
+class _FooterContacts extends StatelessWidget {
+  const _FooterContacts();
 
   @override
   Widget build(BuildContext context) {
-    final alignment = alignEnd
-        ? CrossAxisAlignment.end
-        : CrossAxisAlignment.start;
-    final wrapAlignment = alignEnd ? WrapAlignment.end : WrapAlignment.start;
-    final rowAlignment = alignEnd
-        ? MainAxisAlignment.end
-        : MainAxisAlignment.start;
+    final hasEmail = ContactData.hasConfiguredEmail;
+    final hasSocial =
+        ContactData.configuredLinkedInUrl != null ||
+        ContactData.configuredGithubUrl != null;
+    if (!hasEmail && !hasSocial) {
+      return const SizedBox.shrink();
+    }
 
-    return Column(
-      crossAxisAlignment: alignment,
-      children: [
-        Wrap(
-          spacing: AppSpacing.xs,
-          runSpacing: AppSpacing.xs,
-          alignment: wrapAlignment,
-          children: [
-            for (final section in PortfolioSection.values)
-              _FooterLink(section: section),
-          ],
-        ),
-        const SizedBox(height: AppSpacing.md),
-        ContactSocialLinks(alignment: rowAlignment),
-      ],
-    );
-  }
-}
-
-class _FooterLink extends StatelessWidget {
-  const _FooterLink({required this.section});
-
-  final PortfolioSection section;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = AppColors.of(context);
-
-    return TextButton(
-      onPressed: () {
-        SectionNavigator.maybeOf(context)?.scrollTo(section);
-      },
-      style: ButtonStyle(
-        foregroundColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.hovered) ||
-              states.contains(WidgetState.focused)) {
-            return colors.accent;
-          }
-          return colors.textSecondary;
-        }),
-        overlayColor: WidgetStateProperty.all(colors.hoverOverlay),
-        padding: WidgetStateProperty.all(
-          const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: AppSpacing.sm,
-          ),
-        ),
-        minimumSize: WidgetStateProperty.all(
-          const Size(AppSpacing.tapTarget, AppSpacing.tapTarget),
-        ),
-        textStyle: WidgetStateProperty.all(
-          Theme.of(context).textTheme.labelLarge,
-        ),
-        animationDuration: AppConstants.motionFast,
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.lg),
+      child: Wrap(
+        spacing: AppSpacing.sm,
+        runSpacing: AppSpacing.sm,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          if (hasEmail)
+            IconButton(
+              tooltip: ContactData.emailMe,
+              onPressed: () => ContactActions.emailMe(context),
+              icon: const Icon(Icons.mail_outline),
+            ),
+          const ContactSocialLinks(),
+        ],
       ),
-      child: Text(section.label),
     );
   }
 }

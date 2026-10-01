@@ -18,12 +18,12 @@ class ThemeMenuButton extends StatelessWidget {
       consumeOutsideTap: true,
       clipBehavior: Clip.antiAlias,
       style: MenuStyle(
-        backgroundColor: WidgetStateProperty.all(colors.surfaceElevated),
-        surfaceTintColor: WidgetStateProperty.all(colors.surfaceElevated),
+        backgroundColor: WidgetStateProperty.all(colors.surface),
+        surfaceTintColor: WidgetStateProperty.all(colors.surface),
         shadowColor: WidgetStateProperty.all(
-          colors.textPrimary.withValues(alpha: 0.12),
+          colors.textPrimary.withValues(alpha: 0.08),
         ),
-        elevation: WidgetStateProperty.all(8),
+        elevation: WidgetStateProperty.all(4),
         padding: WidgetStateProperty.all(EdgeInsets.zero),
         alignment: Alignment.bottomLeft,
         maximumSize: WidgetStateProperty.all(const Size(_menuWidth, 520)),
@@ -49,7 +49,7 @@ class ThemeMenuButton extends StatelessWidget {
               );
             }
           },
-          icon: const Icon(Icons.palette_outlined),
+          icon: Icon(Icons.palette_outlined, color: colors.accent),
         );
       },
       menuChildren: const [

@@ -13,7 +13,7 @@ A personal portfolio website built with Flutter Web to showcase Kiranpreet Kaur'
 
 - Responsive portfolio website
 - Dark, light, and system appearance
-- Accent theme selection: Ocean Blue, Emerald, Violet, Coral, and Amber
+- Accent theme selection: Ocean Blue, Editorial Burgundy, Emerald, Violet, Coral, and Amber
 - Project showcase
 - Project case studies
 - Responsive layouts for mobile, tablet, and desktop
@@ -75,7 +75,7 @@ flutter build web --release
 
 Upload the contents of that folder. The default build uses `<base href="/">`, which matches a site hosted at the domain root.
 
-The host must serve `index.html` for application routes when the browser requests a path directly. Those routes are `/`, `/projects/viewghana`, `/projects/bumper-buds`, and `/projects/daawat`.
+The host must serve `index.html` for application routes when the browser requests a path directly. Those routes are `/`, `/profile`, `/freelance`, `/projects/viewghana`, `/projects/bumper-buds`, and `/projects/daawat`.
 
 `web/robots.txt` allows crawling. The sitemap line stays commented until a public site URL is set in `lib/core/config/site_config.dart`. This repository does not record a completed deployment.
 

@@ -3,6 +3,7 @@ import 'package:kiran_portfolio/features/about/presentation/widgets/about_sectio
 import 'package:kiran_portfolio/features/contact/presentation/widgets/contact_section.dart';
 import 'package:kiran_portfolio/features/education/presentation/widgets/education_section.dart';
 import 'package:kiran_portfolio/features/experience/presentation/widgets/experience_section.dart';
+import 'package:kiran_portfolio/features/home/presentation/widgets/editorial_layout.dart';
 import 'package:kiran_portfolio/features/home/presentation/widgets/hero_section.dart';
 import 'package:kiran_portfolio/features/home/presentation/widgets/portfolio_footer.dart';
 import 'package:kiran_portfolio/features/home/presentation/widgets/portfolio_shell.dart';
@@ -19,12 +20,19 @@ class HomePage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           HeroSection(),
-          AboutSection(),
-          SkillsSection(),
-          ProjectsSection(),
-          ExperienceSection(),
-          EducationSection(),
-          ContactSection(),
+          EditorialLayout(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                AboutSection(),
+                SkillsSection(),
+                ProjectsSection(),
+                ExperienceSection(),
+                EducationSection(),
+                ContactSection(),
+              ],
+            ),
+          ),
           PortfolioFooter(),
         ],
       ),

@@ -8,9 +8,10 @@ import 'package:kiran_portfolio/features/projects/presentation/widgets/project_i
 import 'package:kiran_portfolio/features/projects/presentation/widgets/project_image_viewer.dart';
 
 class ProjectVisual extends StatefulWidget {
-  const ProjectVisual({super.key, required this.project});
+  const ProjectVisual({super.key, required this.project, this.height});
 
   final ProjectData project;
+  final double? height;
 
   @override
   State<ProjectVisual> createState() => _ProjectVisualState();
@@ -46,7 +47,7 @@ class _ProjectVisualState extends State<ProjectVisual> {
           duration: AppConstants.motionTheme,
           curve: Curves.easeOut,
           child: SizedBox(
-            height: compact ? 280 : 360,
+            height: widget.height ?? (compact ? 280 : 360),
             width: double.infinity,
             child: _VisualSurface(
               project: widget.project,
@@ -123,44 +124,59 @@ class _FallbackVisual extends StatelessWidget {
     final initials = _initialsFor(project.title);
     final variant = project.id.hashCode.abs() % 3;
 
-    return Padding(
-      padding: const EdgeInsets.all(AppSpacing.xl),
-      child: Stack(
-        children: [
-          Positioned.fill(child: _AbstractPattern(variant: variant)),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final compact = constraints.maxHeight < 220;
+        return Padding(
+          padding: EdgeInsets.all(compact ? AppSpacing.md : AppSpacing.xl),
+          child: Stack(
             children: [
-              Text(
-                'PROJECT VISUAL',
-                style: textTheme.labelMedium?.copyWith(
-                  color: colors.textSecondary,
-                  letterSpacing: 1.4,
-                ),
+              Positioned.fill(child: _AbstractPattern(variant: variant)),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'PROJECT VISUAL',
+                    style: textTheme.labelMedium?.copyWith(
+                      color: colors.textSecondary,
+                      letterSpacing: 1.4,
+                    ),
+                  ),
+                  const Spacer(),
+                  if (!compact)
+                    Text(
+                      initials,
+                      style: textTheme.displayMedium?.copyWith(
+                        color: colors.accent,
+                        letterSpacing: -1.2,
+                      ),
+                    ),
+                  if (!compact) const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    project.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: compact
+                        ? textTheme.titleMedium
+                        : textTheme.titleLarge,
+                  ),
+                  if (!compact) ...[
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(project.category, style: textTheme.bodySmall),
+                    if (project.platforms.isNotEmpty) ...[
+                      const SizedBox(height: AppSpacing.md),
+                      Text(
+                        project.platforms.join('  ·  '),
+                        style: textTheme.labelMedium,
+                      ),
+                    ],
+                  ],
+                ],
               ),
-              const Spacer(),
-              Text(
-                initials,
-                style: textTheme.displayMedium?.copyWith(
-                  color: colors.accent,
-                  letterSpacing: -1.2,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Text(project.title, style: textTheme.titleLarge),
-              const SizedBox(height: AppSpacing.xs),
-              Text(project.category, style: textTheme.bodySmall),
-              if (project.platforms.isNotEmpty) ...[
-                const SizedBox(height: AppSpacing.md),
-                Text(
-                  project.platforms.join('  ·  '),
-                  style: textTheme.labelMedium,
-                ),
-              ],
             ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 

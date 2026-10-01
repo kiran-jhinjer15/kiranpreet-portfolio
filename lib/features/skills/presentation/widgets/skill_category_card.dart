@@ -47,7 +47,7 @@ class _SkillCategoryCardState extends State<SkillCategoryCard> {
           width: double.infinity,
           padding: const EdgeInsets.all(AppSpacing.lg),
           decoration: BoxDecoration(
-            color: colors.surfaceElevated,
+            color: colors.surface,
             borderRadius: BorderRadius.circular(AppSpacing.sm),
             border: Border.all(
               color: _hovered

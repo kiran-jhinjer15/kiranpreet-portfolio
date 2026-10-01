@@ -13,7 +13,7 @@ abstract final class AppSpacing {
   static const double section = 80;
   static const double sectionLarge = 96;
 
-  static const double navbarHeight = 64;
+  static const double navbarHeight = 76;
   static const double tapTarget = 44;
 
   static double pageHorizontal(BuildContext context) {

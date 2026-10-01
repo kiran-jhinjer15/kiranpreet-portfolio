@@ -20,7 +20,10 @@ import 'package:kiran_portfolio/features/about/presentation/about_page.dart';
 import 'package:kiran_portfolio/features/contact/presentation/widgets/contact_form.dart';
 import 'package:kiran_portfolio/features/contact/presentation/contact_page.dart';
 import 'package:kiran_portfolio/features/experience/presentation/experience_page.dart';
+import 'package:kiran_portfolio/features/freelance/presentation/freelance_page.dart';
 import 'package:kiran_portfolio/features/home/presentation/home_page.dart';
+import 'package:kiran_portfolio/features/profile/presentation/profile_copy.dart';
+import 'package:kiran_portfolio/features/profile/presentation/profile_page.dart';
 import 'package:kiran_portfolio/features/projects/presentation/projects_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -44,7 +47,7 @@ void main() {
     expect(find.byIcon(Icons.add), findsNothing);
 
     final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
-    expect(app.themeMode, ThemeMode.system);
+    expect(app.themeMode, ThemeMode.light);
     expect(app.theme?.brightness, Brightness.light);
     expect(app.darkTheme?.brightness, Brightness.dark);
     expect(app.theme?.scaffoldBackgroundColor, AppColors.light.background);
@@ -53,7 +56,7 @@ void main() {
     expect(app.darkTheme?.colorScheme.primary, AppColors.dark.accent);
   });
 
-  testWidgets('uses dark theme when platform brightness is dark', (
+  testWidgets('stays on the cream theme when platform brightness is dark', (
     tester,
   ) async {
     tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
@@ -64,10 +67,10 @@ void main() {
 
     final context = tester.element(find.byType(Scaffold));
     final theme = Theme.of(context);
-    expect(theme.brightness, Brightness.dark);
-    expect(theme.scaffoldBackgroundColor, AppColors.dark.background);
-    expect(theme.colorScheme.primary, AppColors.dark.accent);
-    expect(theme.textTheme.headlineLarge?.color, AppColors.dark.textPrimary);
+    expect(theme.brightness, Brightness.light);
+    expect(theme.scaffoldBackgroundColor, AppColors.light.background);
+    expect(theme.colorScheme.primary, AppColors.light.accent);
+    expect(theme.textTheme.headlineLarge?.color, AppColors.light.textPrimary);
   });
 
   testWidgets('uses light theme when platform brightness is light', (
@@ -92,11 +95,11 @@ void main() {
     await tester.pumpWidget(const PortfolioApp());
     await tester.pumpAndSettle();
 
-    expect(find.text('About'), findsNWidgets(2));
-    expect(find.text('Skills'), findsNWidgets(2));
-    expect(find.text('Projects'), findsNWidgets(2));
+    expect(find.text('About'), findsOneWidget);
+    expect(find.text('Skills'), findsOneWidget);
+    expect(find.text('Projects'), findsOneWidget);
     expect(find.text('Experience'), findsAtLeastNWidgets(1));
-    expect(find.text('Contact'), findsNWidgets(2));
+    expect(find.text('Contact'), findsOneWidget);
     expect(find.byTooltip('Open menu'), findsNothing);
     expect(find.byTooltip('Theme settings'), findsOneWidget);
     expect(find.byTooltip('Switch to dark theme'), findsNothing);
@@ -112,34 +115,34 @@ void main() {
     expect(find.text('KIRANPREET'), findsNWidgets(2));
     expect(find.byTooltip('Open menu'), findsOneWidget);
     expect(find.byTooltip('Theme settings'), findsNothing);
-    expect(find.text('Projects'), findsOneWidget);
+    expect(find.text('Projects'), findsNothing);
 
     await tester.tap(find.byTooltip('Open menu'));
     await tester.pump();
     await tester.pump(AppConstants.motionFast);
 
-    expect(find.text('About'), findsNWidgets(2));
-    expect(find.text('Skills'), findsNWidgets(2));
-    expect(find.text('Projects'), findsNWidgets(2));
+    expect(find.text('About'), findsOneWidget);
+    expect(find.text('Skills'), findsOneWidget);
+    expect(find.text('Projects'), findsOneWidget);
     expect(find.text('Experience'), findsAtLeastNWidgets(1));
-    expect(find.text('Contact'), findsNWidgets(2));
+    expect(find.text('Contact'), findsOneWidget);
     expect(find.text('Appearance'), findsOneWidget);
     expect(find.text('Ocean Blue'), findsOneWidget);
 
     await tester.tap(find.byTooltip('Close menu'));
     await tester.pump();
     await tester.pump(AppConstants.motionFast);
-    expect(find.text('Projects'), findsOneWidget);
+    expect(find.text('Projects'), findsNothing);
   });
 
-  testWidgets('uses compact navigation on tablet widths', (tester) async {
+  testWidgets('shows the sidebar on tablet widths', (tester) async {
     await setSurface(tester, const Size(800, 1024));
     await tester.pumpWidget(const PortfolioApp());
     await tester.pumpAndSettle();
 
-    expect(find.byTooltip('Open menu'), findsOneWidget);
-    expect(find.byTooltip('Theme settings'), findsNothing);
-    expect(find.text('Projects'), findsOneWidget);
+    expect(find.byTooltip('Open menu'), findsNothing);
+    expect(find.byTooltip('Theme settings'), findsOneWidget);
+    expect(find.text('Projects'), findsWidgets);
   });
 
   testWidgets('theme menu switches appearance and accent color', (
@@ -161,6 +164,7 @@ void main() {
 
     expect(find.text('Appearance'), findsOneWidget);
     expect(find.text('Accent Color'), findsOneWidget);
+    expect(find.text('Editorial Burgundy'), findsOneWidget);
     expect(find.text('Ocean Blue'), findsOneWidget);
     expect(find.text('Emerald'), findsOneWidget);
 
@@ -237,10 +241,12 @@ void main() {
     await tester.pumpWidget(const PortfolioApp());
     await tester.pumpAndSettle();
 
-    final heading = find.text("Projects I've built and worked on.");
+    final heading = find.text('Featured Projects');
     expect(tester.getTopLeft(heading).dy, greaterThan(400));
 
-    await tester.tap(find.text('Projects').first);
+    final projectsLink = find.byKey(const ValueKey('section-nav-projects'));
+    await tester.ensureVisible(projectsLink);
+    await tester.tap(projectsLink);
     await tester.pumpAndSettle();
 
     expect(tester.getTopLeft(heading).dy, lessThan(220));
@@ -258,7 +264,9 @@ void main() {
     );
     expect(tester.getTopLeft(heading).dy, greaterThan(400));
 
-    await tester.tap(find.text('About').first);
+    final aboutLink = find.byKey(const ValueKey('section-nav-about'));
+    await tester.ensureVisible(aboutLink);
+    await tester.tap(aboutLink);
     await tester.pumpAndSettle();
 
     expect(tester.getTopLeft(heading).dy, lessThan(220));
@@ -274,7 +282,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Kiranpreet Kaur'), findsWidgets);
-    expect(find.text('View My Work'), findsOneWidget);
+    expect(find.text('View My Work →'), findsOneWidget);
     expect(find.text('Download Resume'), findsNWidgets(2));
     expect(find.text('4+ Years'), findsOneWidget);
     expect(
@@ -282,12 +290,9 @@ void main() {
       findsOneWidget,
     );
 
-    await tester.tap(find.text('View My Work'));
+    await tester.tap(find.text('View My Work →'));
     await tester.pumpAndSettle();
-    expect(
-      tester.getTopLeft(find.text("Projects I've built and worked on.")).dy,
-      lessThan(220),
-    );
+    expect(tester.getTopLeft(find.text('Featured Projects')).dy, lessThan(220));
   });
 
   testWidgets('renders the about section after the hero', (tester) async {
@@ -325,7 +330,7 @@ void main() {
     expect(find.text('Development & Quality'), findsOneWidget);
     expect(find.text('Flutter Web'), findsOneWidget);
     expect(find.text('Riverpod'), findsWidgets);
-    expect(find.text('Appwrite'), findsOneWidget);
+    expect(find.text('Appwrite'), findsWidgets);
     expect(find.text('Stripe'), findsWidgets);
     expect(find.text('Google Play Console'), findsOneWidget);
     expect(find.text('Performance Optimization'), findsNWidgets(2));
@@ -341,7 +346,9 @@ void main() {
     final heading = find.text('Tools I use to build production applications.');
     expect(tester.getTopLeft(heading).dy, greaterThan(400));
 
-    await tester.tap(find.text('Skills').first);
+    final skillsLink = find.byKey(const ValueKey('section-nav-skills'));
+    await tester.ensureVisible(skillsLink);
+    await tester.tap(skillsLink);
     await tester.pumpAndSettle();
 
     expect(tester.getTopLeft(heading).dy, lessThan(220));
@@ -354,7 +361,7 @@ void main() {
     await tester.pumpWidget(const PortfolioApp());
     await tester.pumpAndSettle();
 
-    expect(find.text('View My Work'), findsOneWidget);
+    expect(find.text('View My Work →'), findsOneWidget);
     expect(find.text('Download Resume'), findsNWidgets(2));
     expect(find.text('ABOUT ME'), findsOneWidget);
     expect(find.text('Career snapshot'), findsOneWidget);
@@ -374,7 +381,9 @@ void main() {
     );
     expect(tester.getTopLeft(heading).dy, greaterThan(400));
 
-    await tester.tap(find.text('Experience').first);
+    final experienceLink = find.byKey(const ValueKey('section-nav-experience'));
+    await tester.ensureVisible(experienceLink);
+    await tester.tap(experienceLink);
     await tester.pumpAndSettle();
 
     expect(tester.getTopLeft(heading).dy, lessThan(220));
@@ -516,7 +525,9 @@ void main() {
     final heading = find.text("Let's build something great together.");
     expect(tester.getTopLeft(heading).dy, greaterThan(400));
 
-    await tester.tap(find.text('Contact').first);
+    final contactLink = find.byKey(const ValueKey('section-nav-contact'));
+    await tester.ensureVisible(contactLink);
+    await tester.tap(contactLink);
     await tester.pumpAndSettle();
 
     expect(tester.getTopLeft(heading).dy, lessThan(220));
@@ -550,22 +561,11 @@ void main() {
     final contactTop = tester.getTopLeft(find.text('CONTACT')).dy;
     final footerTop = tester.getTopLeft(find.text('Built with Flutter')).dy;
     expect(footerTop, greaterThan(contactTop));
+    expect(find.text('About'), findsOneWidget);
 
-    final footerAbout = find.text('About').last;
-    await tester.ensureVisible(footerAbout);
-    await tester.tap(footerAbout);
-    await tester.pumpAndSettle();
-
-    expect(
-      tester
-          .getTopLeft(
-            find.text('Turning ideas into production-ready applications.'),
-          )
-          .dy,
-      lessThan(220),
-    );
-
-    await tester.tap(find.text('Contact').first);
+    final contactLink = find.byKey(const ValueKey('section-nav-contact'));
+    await tester.ensureVisible(contactLink);
+    await tester.tap(contactLink);
     await tester.pumpAndSettle();
     expect(
       tester.getTopLeft(find.text("Let's build something great together.")).dy,
@@ -577,7 +577,7 @@ void main() {
     await tester.pumpAndSettle();
 
     final heroEyebrow = tester.getTopLeft(find.text('FLUTTER DEVELOPER')).dy;
-    expect(heroEyebrow, lessThan(180));
+    expect(heroEyebrow, lessThan(220));
     expect(heroEyebrow, greaterThan(40));
     expect(tester.takeException(), isNull);
   });
@@ -689,7 +689,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('SELECTED WORK'), findsOneWidget);
-    expect(find.text("Projects I've built and worked on."), findsOneWidget);
+    expect(find.text('Featured Projects'), findsOneWidget);
+    expect(find.text('View All Projects →'), findsOneWidget);
     expect(find.text('Daawat'), findsWidgets);
     expect(find.text('ViewGhana'), findsWidgets);
     expect(find.text('Bumper Buds'), findsWidgets);
@@ -744,7 +745,7 @@ void main() {
     expect(find.text('ViewGhana'), findsOneWidget);
     expect(find.text('App Store'), findsNothing);
     expect(find.text('Google Play'), findsNothing);
-    expect(find.text('View My Work'), findsNothing);
+    expect(find.text('View My Work →'), findsNothing);
     expect(find.text('Other Projects'), findsNothing);
     expect(find.textContaining('download'), findsNothing);
     expect(find.textContaining('revenue'), findsNothing);
@@ -807,8 +808,37 @@ void main() {
     expect(SectionRequest.take(), PortfolioSection.projects);
   });
 
+  testWidgets('profile hub stays within the existing layout widths', (
+    tester,
+  ) async {
+    for (final size in const [
+      Size(390, 844),
+      Size(800, 1024),
+      Size(1280, 900),
+      Size(1440, 900),
+    ]) {
+      await setSurface(tester, size);
+      await tester.pumpWidget(
+        MaterialApp(theme: AppTheme.dark(), home: const ProfilePage()),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text(ProfileCopy.directionsHeading), findsOneWidget);
+      expect(find.text(ProfileCopy.developerCta), findsOneWidget);
+      expect(find.text(ProfileCopy.freelanceCta), findsOneWidget);
+      expect(
+        find.text('Master of Computer Applications (MCA)'),
+        findsOneWidget,
+      );
+      expect(find.text('LUMESTEA INNOVEX PVT. LTD.'), findsOneWidget);
+      expect(find.text(ContactData.emailUnavailableMessage), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    }
+  });
+
   test('maps and normalizes the basic portfolio routes', () {
     expect(AppRoutes.normalize('/about/'), AppRoutes.about);
+    expect(AppRoutes.normalize('/profile'), AppRoutes.profile);
+    expect(AppRoutes.normalize('/freelance/'), AppRoutes.freelance);
     expect(AppRoutes.normalize('/unknown'), AppRoutes.home);
     expect(AppRoutes.normalize('/projects/daawat'), '/projects/daawat');
     expect(AppRoutes.normalize('/projects/unknown'), AppRoutes.home);
@@ -817,6 +847,8 @@ void main() {
     expect(AppRoutes.pageFor(AppRoutes.experience), isA<ExperiencePage>());
     expect(AppRoutes.pageFor(AppRoutes.contact), isA<ContactPage>());
     expect(AppRoutes.pageFor(AppRoutes.home), isA<HomePage>());
+    expect(AppRoutes.pageFor(AppRoutes.profile), isA<ProfilePage>());
+    expect(AppRoutes.pageFor(AppRoutes.freelance), isA<FreelancePage>());
     expect(AppRoutes.pageFor('/projects/daawat'), isA<ProjectCaseStudyPage>());
     expect(
       AppRoutes.pageFor('/projects/viewghana'),
@@ -926,7 +958,54 @@ void main() {
 
   test('resolves accent themes by id with a fallback', () {
     expect(AccentThemes.byId('coral').name, 'Coral');
+    expect(AccentThemes.byId(null), AccentThemes.oceanBlue);
     expect(AccentThemes.byId('missing'), AccentThemes.oceanBlue);
-    expect(AccentThemes.all, hasLength(5));
+    expect(AccentThemes.byId('ocean-blue'), AccentThemes.oceanBlue);
+    expect(AccentThemes.burgundy.name, 'Editorial Burgundy');
+    expect(AccentThemes.all, hasLength(6));
   });
+
+  test(
+    'moves a stored Editorial Burgundy default to Ocean Blue once',
+    () async {
+      SharedPreferences.setMockInitialValues({
+        ThemeController.accentKey: AccentThemes.burgundy.id,
+        ThemeController.accentRevisionKey: 'editorial-1',
+        ThemeController.appearanceKey: 'light',
+      });
+
+      final migrated = await ThemeController.restore();
+      addTearDown(migrated.dispose);
+      expect(migrated.accentTheme, AccentThemes.oceanBlue);
+      expect(migrated.mode, ThemeMode.light);
+
+      migrated.setAccent(AccentThemes.burgundy);
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+
+      final kept = await ThemeController.restore();
+      addTearDown(kept.dispose);
+      expect(kept.accentTheme, AccentThemes.burgundy);
+
+      SharedPreferences.setMockInitialValues({
+        ThemeController.accentKey: AccentThemes.emerald.id,
+      });
+      final emerald = await ThemeController.restore();
+      addTearDown(emerald.dispose);
+      expect(emerald.accentTheme, AccentThemes.emerald);
+
+      SharedPreferences.setMockInitialValues({
+        ThemeController.appearanceKey: ThemeMode.system.name,
+      });
+      final systemDefault = await ThemeController.restore();
+      addTearDown(systemDefault.dispose);
+      expect(systemDefault.mode, ThemeMode.light);
+
+      SharedPreferences.setMockInitialValues({
+        ThemeController.appearanceKey: ThemeMode.dark.name,
+      });
+      final darkChoice = await ThemeController.restore();
+      addTearDown(darkChoice.dispose);
+      expect(darkChoice.mode, ThemeMode.dark);
+    },
+  );
 }

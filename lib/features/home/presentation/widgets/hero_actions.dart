@@ -19,6 +19,7 @@ class HeroActions extends StatelessWidget {
     final stackButtons = Responsive.isMobile(context);
     final primary = PortfolioPrimaryButton(
       label: HeroCopy.viewWork,
+      borderRadius: 999,
       onPressed: () => _onViewWork(context),
     );
     final secondary = Tooltip(
@@ -27,6 +28,7 @@ class HeroActions extends StatelessWidget {
           : ResumeAction.unavailableLabel,
       child: PortfolioSecondaryButton(
         label: HeroCopy.downloadResume,
+        borderRadius: 999,
         onPressed: ResumeAction.isAvailable ? ResumeAction.open : null,
       ),
     );

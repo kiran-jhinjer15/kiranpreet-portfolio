@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kiran_portfolio/features/experience/presentation/widgets/experience_section.dart';
+import 'package:kiran_portfolio/features/home/presentation/widgets/editorial_layout.dart';
 import 'package:kiran_portfolio/features/home/presentation/widgets/portfolio_shell.dart';
 
 class ExperiencePage extends StatelessWidget {
@@ -7,6 +8,8 @@ class ExperiencePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const PortfolioShell(body: ExperienceSection());
+    return const PortfolioShell(
+      body: EditorialLayout(child: ExperienceSection()),
+    );
   }
 }

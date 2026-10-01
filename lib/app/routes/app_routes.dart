@@ -4,19 +4,31 @@ import 'package:kiran_portfolio/core/navigation/section_request.dart';
 import 'package:kiran_portfolio/features/about/presentation/about_page.dart';
 import 'package:kiran_portfolio/features/contact/presentation/contact_page.dart';
 import 'package:kiran_portfolio/features/experience/presentation/experience_page.dart';
+import 'package:kiran_portfolio/features/freelance/presentation/freelance_page.dart';
 import 'package:kiran_portfolio/features/home/presentation/home_page.dart';
+import 'package:kiran_portfolio/features/profile/presentation/profile_page.dart';
 import 'package:kiran_portfolio/features/projects/data/projects_data.dart';
 import 'package:kiran_portfolio/features/projects/presentation/pages/project_case_study_page.dart';
 import 'package:kiran_portfolio/features/projects/presentation/projects_page.dart';
 
 abstract final class AppRoutes {
   static const String home = '/';
+  static const String profile = '/profile';
+  static const String freelance = '/freelance';
   static const String about = '/about';
   static const String projects = '/projects';
   static const String experience = '/experience';
   static const String contact = '/contact';
 
-  static const List<String> all = [home, about, projects, experience, contact];
+  static const List<String> all = [
+    home,
+    profile,
+    freelance,
+    about,
+    projects,
+    experience,
+    contact,
+  ];
 
   static String normalize(String path) {
     if (path.isEmpty) {
@@ -47,6 +59,8 @@ abstract final class AppRoutes {
     }
 
     return switch (normalized) {
+      profile => const ProfilePage(),
+      freelance => const FreelancePage(),
       about => const AboutPage(),
       projects => const ProjectsPage(),
       experience => const ExperiencePage(),
